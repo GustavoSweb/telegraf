@@ -14,4 +14,5 @@ const connection = new sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite'
 })
+connection.sync({force: true})
 module.exports = connection
