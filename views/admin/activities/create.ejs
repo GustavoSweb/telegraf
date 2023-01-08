@@ -11,7 +11,7 @@
           <label>Titulo da atividade</label>
     <input type="text" name="title" class="form-control"><br>
           <label>Escolha a materia</label>
-    <select name="matter" class="form-control">
+    <select name="matterId" class="form-control">
             <% matter.forEach((matte)=> {%>
               <option value="<%=matte.id%>"><%=matte.name%></option>
            <% })%>
@@ -20,7 +20,7 @@
           <label>Url para download</label>
     <input type="text" name="url" class="form-control"><br>
           <label>Data de entrega</label>
-    <input type="date" name="date" class="form-control"><br>
+    <input type="date" name="entday" class="form-control"><br>
 
     <button type="submit" class = "btn btn-primary">Cadastrar</button>
   </form>

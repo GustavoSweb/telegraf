@@ -3,31 +3,29 @@ const router = express.Router()
 
 const matter = require("./Matter")
 
-router.get("/matter", (req, res)=> {
-  res.render("admin/matter/index.ejs")
+router.get("/admin/matter",async (req, res)=> {
+  const matterAll = await matter.findAll()
+  res.render("admin/matter/index.ejs", {
+    matter:matterAll
+  })
 })
 router.get("/matter/create", (req, res)=> {
   res.render("admin/matter/create.ejs")
 })
-router.post("/matter/save", (req, res)=> {
-  
-  const name = req.body.title
-  console.log(name)
-  async function create() {
-try{
+router.post("/matter/save", async (req, res)=> {
+  const { name }= req.body
+  if(name == undefined) res.redirect("/admin/matter/create")
+  try{
+    
     matter.create({
     name
   })
-    }catch(err){
-      console.log(err)
-    }
+  res.redirect("/admin/matter")
+  }catch(err){
+    res.redirect("/admin/matter/create")
   }
-  create()
-    
   
   
-  
-  res.redirect("/")
 })
 
 module.exports = router

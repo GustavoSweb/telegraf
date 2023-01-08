@@ -20,11 +20,7 @@ async function database(){
   }
 }
 database()
-activities.findAll().then((activity)=> {
-  activity.forEach(activ => {
-    
-})
-})
+
 
 app.use(bodyPaser.urlencoded({extended: false}))
 app.use(bodyPaser.json())

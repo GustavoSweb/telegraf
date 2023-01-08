@@ -1,6 +1,9 @@
 <%- include("../../partials/header")%>
 
-<table class="table table-bordered">
+<div class="mt-5">
+  
+
+<table class="table table-bordered" >
   <thead>
     <tr>
       <th>Id</th>
@@ -11,20 +14,20 @@
     </tr>
   </thead>
   <tbody>
-    <% activities.forEach(activity => {%>
-    <% const  matt = matter.findOne({ where: { id: activity.matterid }}).then((matt) =>{%>
+    <% activities.find(activity => {%>
+
       <tr>
         <td><%=activity.id%></td>
         <td><%=activity.title%></td>
-        <td><%=matt.name%></td>
+        <td><%=activity.matter.name%></td>
         <td><%=activity.entday%></td>
-        <td></td>
+        <td><a href="/admin/activities/edit/<%=activity.id%>" class="btn btn-primary">Editar</a><a href="/admin/activities/editar" class="btn btn-danger">Deletar</a></td>
       </tr>
-    <%})%>
+
 
     <%})%>
-        <%throw new Error("erro")%>
+
   </tbody>
 </table>
-
+</div>
 <%- include("../../partials/footer")%>

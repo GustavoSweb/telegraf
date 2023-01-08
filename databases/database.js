@@ -9,10 +9,12 @@ const connection = new sequelize("blog", process.env.USER, process.env.PASSWORD,
     }
   },
   timezone: "-03:00"
-})*/
+})
 const connection = new sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite'
-})
-connection.sync({force: true})
+})*/
+const connection = new sequelize("postgres://lcnbqxeb:pRbN9UxwpXoBrqPL7Yb7jW-DNhHBjaNM@babar.db.elephantsql.com/lcnbqxeb")
+
+connection.sync({force: false})
 module.exports = connection

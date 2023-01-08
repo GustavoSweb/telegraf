@@ -6,10 +6,7 @@ const activities = connection.define("activities", {
     type: sequelize.STRING,
     allowNull: false
   },
-  matterid:{
-    type: sequelize.INTEGER,
-    allowNull: false
-  },
+  
   url: {
     type: sequelize.STRING,
     allowNull: false
@@ -19,6 +16,6 @@ const activities = connection.define("activities", {
     allowNull: false
   }
 })
-
+activities.belongsTo(matter)
 
 module.exports = activities
