@@ -18,10 +18,16 @@ export interface AsyncSessionStore<T> {
 
 export type SessionStore<T> = SyncSessionStore<T> | AsyncSessionStore<T>
 
-interface SessionOptions<S extends object, C extends Context = Context> {
-  getSessionKey?: (ctx: C) => Promise<string | undefined>
+interface SessionOptions<
+  S extends object,
+  C extends Context = Context,
+  Property extends string = 'session'
+> {
+  getSessionKey?: (ctx: C) => MaybePromise<string | undefined>
   store?: SessionStore<S>
   defaultSession?: (ctx: C) => S
+  /** Defaults to `session`. If provided, property name will be used instead of `ctx.session`. */
+  property?: Property
 }
 
 export interface SessionContext<S extends object> extends Context {
@@ -34,7 +40,7 @@ export interface SessionContext<S extends object> extends Context {
  * The default `getSessionKey` is `${ctx.from.id}:${ctx.chat.id}`.
  * If either `ctx.from` or `ctx.chat` is `undefined`, default session key and thus `ctx.session` are also `undefined`.
  *
- * > ⚠️ Session data is kept only in memory by default,  which means that all data will be lost when the process is terminated.
+ * > ⚠️ Session data is kept only in memory by default, which means that all data will be lost when the process is terminated.
  * >
  * > If you want to store data across restarts, or share it among workers, you should use
  * [@telegraf/session](https://www.npmjs.com/package/@telegraf/session), or pass custom `storage`.
@@ -42,10 +48,13 @@ export interface SessionContext<S extends object> extends Context {
  * @see {@link https://github.com/feathers-studio/telegraf-docs/blob/b694bcc36b4f71fb1cd650a345c2009ab4d2a2a5/guide/session.md Telegraf Docs | Session}
  * @see {@link https://github.com/feathers-studio/telegraf-docs/blob/master/examples/session-bot.ts Example}
  */
-export function session<S extends object, C extends Context = Context>(
-  options?: SessionOptions<S, C>
-): MiddlewareFn<C & { session?: S }> {
+export function session<
+  S extends object,
+  C extends Context = Context,
+  P extends string = 'session'
+>(options?: SessionOptions<S, C, P>): MiddlewareFn<C & { [session in P]?: S }> {
   const getSessionKey = options?.getSessionKey ?? defaultGetSessionKey
+  const prop = options?.property ?? ('session' as P)
   const store = options?.store ?? new MemorySessionStore()
   // caches value from store in-memory while simultaneous updates share it
   // when counter reaches 0, the cached ref will be freed from memory
@@ -63,7 +72,11 @@ export function session<S extends object, C extends Context = Context>(
     // v5 getSessionKey should probably be synchronous to avoid that
     const key = await getSessionKey(ctx)
     if (!key) {
-      ctx.session = undefined
+      Object.defineProperty(ctx, prop, {
+        get() {
+          undefined
+        },
+      })
       return await next()
     }
 
@@ -107,7 +120,7 @@ export function session<S extends object, C extends Context = Context>(
 
     let touched = false
 
-    Object.defineProperty(ctx, 'session', {
+    Object.defineProperty(ctx, prop, {
       get() {
         touched = true
         return c.ref
@@ -130,12 +143,12 @@ export function session<S extends object, C extends Context = Context>(
 
       // only update store if ctx.session was touched
       if (touched)
-        if (ctx.session == null) {
+        if (ctx[prop] == null) {
           debug(`(${updId}) ctx.session missing, removing from store`)
           await store.delete(key)
         } else {
           debug(`(${updId}) ctx.session found, updating store`)
-          await store.set(key, ctx.session)
+          await store.set(key, ctx[prop] as S)
         }
     }
   }
