@@ -1,40 +1,27 @@
 require("dotenv").config()
-const bodyPaser= require("body-parser")
+const sequelize = require("sequelize")
 const express = require("express")
 const app = express()
-const matter = require("./matter/Matter")
-const activities = require("./activities/Activities")
 
-const activitiesControl = require("./activities/ActivitiesControl")
-const matterControl = require("./matter/MatterControl")
+const connection = require("./src/database/database")
+const activity = require("./src/models/Activity")
 
-async function database(){
-  
-  const connection = await require("./databases/database")
-  try{
-    await connection.authenticate()
-  
-    await console.log("Banco De Dados Conectado")
-  }catch(err){
-    console.log(err)
-  }
-}
-database()
+const ejs = require("ejs");
 
+(async ()=>{
+    try{
+        await connection.authenticate()
+        console.log("Banco de dados conectado")
+    }catch(err){
+        console.log("Houve um erro", err)
+    }
+})();
 
-app.use(bodyPaser.urlencoded({extended: false}))
-app.use(bodyPaser.json())
-
-app.set("view engime", "ejs")
-
-app.use("/", activitiesControl)
-app.use("/", matterControl)
-
+app.set("view engine", "ejs")
 app.get("/", (req, res)=> {
-  res.render("index.ejs")
+    res.render("home.ejs")
 })
-
 const PORT = process.env.PORT || 8081
 app.listen(PORT, ()=> {
-  console.log("Servidor rodando na porta: ", PORT)
+    console.log("Rodando!! na porta: "+ PORT)
 })
