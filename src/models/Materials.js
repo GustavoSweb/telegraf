@@ -19,4 +19,5 @@ const Materials = connection.define("materials", {
         allowNull: false
     }
 })
-
+Materials.sync({force:false})
+module.exports = Materials

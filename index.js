@@ -5,6 +5,8 @@ const app = express()
 
 const connection = require("./src/database/database")
 const activity = require("./src/models/Activity")
+const materials = require("./src/models/Materials")
+const projects = require("./src/models/Projects")
 
 const ejs = require("ejs");
 
